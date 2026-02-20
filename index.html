@@ -27,6 +27,45 @@
                 });
             }
         });
+
+        AFRAME.registerComponent('day-night-toggle', {
+            init: function () {
+                this.isDay = true;
+                this.el.addEventListener('click', () => {
+                    const scene = document.querySelector('a-scene');
+                    const ambLight = document.querySelector('[light*="type: ambient"]');
+                    const dirLight = document.querySelector('[light*="type: directional"]');
+
+                    if (this.isDay) {
+                        scene.setAttribute('background', 'color: #000022');
+                        if (ambLight) ambLight.setAttribute('light', 'intensity', 0.1);
+                        if (dirLight) dirLight.setAttribute('light', 'intensity', 0.2);
+                        this.el.setAttribute('value', 'Switch to Day');
+                    } else {
+                        scene.setAttribute('background', 'color: #cce0ff');
+                        if (ambLight) ambLight.setAttribute('light', 'intensity', 0.7);
+                        if (dirLight) dirLight.setAttribute('light', 'intensity', 1.2);
+                        this.el.setAttribute('value', 'Switch to Night');
+                    }
+                    this.isDay = !this.isDay;
+                });
+            }
+        });
+
+        AFRAME.registerComponent('wall-light-toggle', {
+            init: function () {
+                this.isOn = false; // Start OFF
+                this.el.addEventListener('click', () => {
+                    const lights = document.querySelectorAll('.wall-light');
+                    this.isOn = !this.isOn;
+                    lights.forEach(light => {
+                        light.setAttribute('light', 'intensity', this.isOn ? 1.0 : 0); // Brighter
+                        light.previousElementSibling.setAttribute('material', 'emissiveIntensity', this.isOn ? 1 : 0);
+                    });
+                    this.el.setAttribute('material', 'color', this.isOn ? '#3498db' : '#2c3e50');
+                });
+            }
+        });
     </script>
 
     <style>
@@ -91,24 +130,243 @@
 
 
         <a-entity id="compoundEnclosure">
-            <a-entity id="compoundFloor" geometry="primitive: plane; width: 40; height: 40" rotation="-90 0 0"
-                position="-5 0.05 25" material="src: #floorTex; repeat: 10 10; roughness: 0.8" receive-shadow="true">
+            <a-entity id="compoundFloor" geometry="primitive: plane; width: 60; height: 40" rotation="-90 0 0"
+                position="5 0.05 25" material="src: #floorTex; repeat: 15 10; roughness: 0.8" receive-shadow="true">
             </a-entity>
 
-            <a-box id="wallBack" position="-5 1.5 5" width="40" height="3" depth="0.5"
-                material="src: #wallTex; repeat: 10 1; roughness: 0.8" cast-shadow="true"></a-box>
+            <a-box id="wallBack" position="5 1.5 5" width="60" height="3" depth="0.5"
+                material="src: #wallTex; repeat: 15 1; roughness: 0.8" cast-shadow="true"></a-box>
             <a-box id="wallLeft" position="-25 1.5 25" width="0.5" height="3" depth="40"
                 material="src: #wallTex; repeat: 10 1; roughness: 0.8" cast-shadow="true"></a-box>
-            <a-box id="wallRight" position="15 1.5 25" width="0.5" height="3" depth="40"
+            <a-box id="wallRight" position="35 1.5 25" width="0.5" height="3" depth="40"
                 material="src: #wallTex; repeat: 10 1; roughness: 0.8" cast-shadow="true"></a-box>
             <a-box id="wallFrontLeft" position="-17.5 1.5 45" width="15" height="3" depth="0.5"
                 material="src: #wallTex; repeat: 4 1; roughness: 0.8" cast-shadow="true"></a-box>
-            <a-box id="wallFrontRight" position="7.5 1.5 45" width="15" height="3" depth="0.5"
-                material="src: #wallTex; repeat: 4 1; roughness: 0.8" cast-shadow="true"></a-box>
+            <a-box id="wallFrontRight" position="17.5 1.5 45" width="35" height="3" depth="0.5"
+                material="src: #wallTex; repeat: 8 1; roughness: 0.8" cast-shadow="true"></a-box>
+
+            <!-- Corner Pillars with Lights -->
+            <a-entity id="cornerPillars">
+                <!-- Back Left -->
+                <a-box position="-25 1.5 5" width="1" height="4" depth="1"
+                    material="src: #wallTex; repeat: 1 1; roughness: 0.8">
+                    <a-sphere radius="0.25" position="0 2.2 0"
+                        material="color: #fff; emissive: #fff; emissiveIntensity: 0"></a-sphere>
+                    <a-entity class="wall-light" light="type: point; intensity: 0; distance: 15; color: #fff"
+                        position="0 2.2 0"></a-entity>
+                </a-box>
+                <!-- Back Right -->
+                <a-box position="35 1.5 5" width="1" height="4" depth="1"
+                    material="src: #wallTex; repeat: 1 1; roughness: 0.8">
+                    <a-sphere radius="0.25" position="0 2.2 0"
+                        material="color: #fff; emissive: #fff; emissiveIntensity: 0"></a-sphere>
+                    <a-entity class="wall-light" light="type: point; intensity: 0; distance: 15; color: #fff"
+                        position="0 2.2 0"></a-entity>
+                </a-box>
+                <!-- Front Left -->
+                <a-box position="-25 1.5 45" width="1" height="4" depth="1"
+                    material="src: #wallTex; repeat: 1 1; roughness: 0.8">
+                    <a-sphere radius="0.25" position="0 2.2 0"
+                        material="color: #fff; emissive: #fff; emissiveIntensity: 0"></a-sphere>
+                    <a-entity class="wall-light" light="type: point; intensity: 0; distance: 15; color: #fff"
+                        position="0 2.2 0"></a-entity>
+                </a-box>
+                <!-- Front Right -->
+                <a-box position="35 1.5 45" width="1" height="4" depth="1"
+                    material="src: #wallTex; repeat: 1 1; roughness: 0.8">
+                    <a-sphere radius="0.25" position="0 2.2 0"
+                        material="color: #fff; emissive: #fff; emissiveIntensity: 0"></a-sphere>
+                    <a-entity class="wall-light" light="type: point; intensity: 0; distance: 15; color: #fff"
+                        position="0 2.2 0"></a-entity>
+                </a-box>
+            </a-entity>
+
+            <!-- Decorative Wall Lights -->
+            <a-entity id="wallLights">
+                <!-- Left Wall -->
+                <a-entity position="-25 3 25">
+                    <a-sphere radius="0.05" position="0 0 -15"
+                        material="color: #fff; emissive: #fff; emissiveIntensity: 0"></a-sphere>
+                    <a-entity class="wall-light" light="type: point; intensity: 0; distance: 5; color: #fff"
+                        position="0 0 -15"></a-entity>
+                    <a-sphere radius="0.05" position="0 0 -5"
+                        material="color: #fff; emissive: #fff; emissiveIntensity: 0"></a-sphere>
+                    <a-entity class="wall-light" light="type: point; intensity: 0; distance: 5; color: #fff"
+                        position="0 0 -5"></a-entity>
+                    <a-sphere radius="0.05" position="0 0 5"
+                        material="color: #fff; emissive: #fff; emissiveIntensity: 0"></a-sphere>
+                    <a-entity class="wall-light" light="type: point; intensity: 0; distance: 5; color: #fff"
+                        position="0 0 5"></a-entity>
+                    <a-sphere radius="0.05" position="0 0 15"
+                        material="color: #fff; emissive: #fff; emissiveIntensity: 0"></a-sphere>
+                    <a-entity class="wall-light" light="type: point; intensity: 0; distance: 5; color: #fff"
+                        position="0 0 15"></a-entity>
+                </a-entity>
+                <!-- Back Wall -->
+                <a-entity position="5 3 5">
+                    <a-sphere radius="0.05" position="-20 0 0"
+                        material="color: #fff; emissive: #fff; emissiveIntensity: 0"></a-sphere>
+                    <a-entity class="wall-light" light="type: point; intensity: 0; distance: 5; color: #fff"
+                        position="-20 0 0"></a-entity>
+                    <a-sphere radius="0.05" position="-10 0 0"
+                        material="color: #fff; emissive: #fff; emissiveIntensity: 0"></a-sphere>
+                    <a-entity class="wall-light" light="type: point; intensity: 0; distance: 5; color: #fff"
+                        position="-10 0 0"></a-entity>
+                    <a-sphere radius="0.05" position="0 0 0"
+                        material="color: #fff; emissive: #fff; emissiveIntensity: 0"></a-sphere>
+                    <a-entity class="wall-light" light="type: point; intensity: 0; distance: 5; color: #fff"
+                        position="0 0 0"></a-entity>
+                    <a-sphere radius="0.05" position="10 0 0"
+                        material="color: #fff; emissive: #fff; emissiveIntensity: 0"></a-sphere>
+                    <a-entity class="wall-light" light="type: point; intensity: 0; distance: 5; color: #fff"
+                        position="10 0 0"></a-entity>
+                    <a-sphere radius="0.05" position="20 0 0"
+                        material="color: #fff; emissive: #fff; emissiveIntensity: 0"></a-sphere>
+                    <a-entity class="wall-light" light="type: point; intensity: 0; distance: 5; color: #fff"
+                        position="20 0 0"></a-entity>
+                </a-entity>
+                <!-- Right Wall -->
+                <a-entity position="35 3 25">
+                    <a-sphere radius="0.05" position="0 0 -15"
+                        material="color: #fff; emissive: #fff; emissiveIntensity: 0"></a-sphere>
+                    <a-entity class="wall-light" light="type: point; intensity: 0; distance: 5; color: #fff"
+                        position="0 0 -15"></a-entity>
+                    <a-sphere radius="0.05" position="0 0 -5"
+                        material="color: #fff; emissive: #fff; emissiveIntensity: 0"></a-sphere>
+                    <a-entity class="wall-light" light="type: point; intensity: 0; distance: 5; color: #fff"
+                        position="0 0 -5"></a-entity>
+                    <a-sphere radius="0.05" position="0 0 5"
+                        material="color: #fff; emissive: #fff; emissiveIntensity: 0"></a-sphere>
+                    <a-entity class="wall-light" light="type: point; intensity: 0; distance: 5; color: #fff"
+                        position="0 0 5"></a-entity>
+                    <a-sphere radius="0.05" position="0 0 15"
+                        material="color: #fff; emissive: #fff; emissiveIntensity: 0"></a-sphere>
+                    <a-entity class="wall-light" light="type: point; intensity: 0; distance: 5; color: #fff"
+                        position="0 0 15"></a-entity>
+                </a-entity>
+            </a-entity>
+
+            <!-- Canopy Hangout Area -->
+            <a-entity id="canopyArea" position="23 0 18" rotation="0 180 0">
+                <!-- Pillars -->
+                <a-cylinder id="canopyPillarFL" radius="0.1" height="4" position="-4 2 4" material="color: #2c3e50">
+                    <!-- Local Light Switch -->
+                    <a-box id="canopyLightSwitch" position="0 0.1 0.12" width="0.15" height="0.15" depth="0.1"
+                        material="color: #2c3e50" wall-light-toggle class="raycastable"></a-box>
+                    <a-text value="Lights" position="0 0.25 0.12" scale="0.4 0.4 0.4" color="#000"
+                        align="center"></a-text>
+                </a-cylinder>
+                <a-cylinder radius="0.1" height="4" position="4 2 4" material="color: #2c3e50"></a-cylinder>
+                <a-cylinder radius="0.1" height="4" position="-4 2 -4" material="color: #2c3e50"></a-cylinder>
+                <a-cylinder radius="0.1" height="4" position="4 2 -4" material="color: #2c3e50"></a-cylinder>
+
+                <!-- Canopy Roof -->
+                <a-box width="8.5" height="0.2" depth="8.5" position="0 4 0"
+                    material="color: #34495e; opacity: 0.9"></a-box>
+
+                <!-- Canopy Lighting -->
+                <a-entity light="type: point; intensity: 0.8; distance: 10; color: #ffebcc"
+                    position="0 3.5 0"></a-entity>
+                <a-sphere radius="0.2" position="0 3.8 0"
+                    material="color: #fff; emissive: #fff; emissiveIntensity: 1"></a-sphere>
+
+                <!-- Glass Walls Enclosure -->
+                <a-box id="glassWallBack" position="0 2 -4.2" width="8.4" height="4" depth="0.1"
+                    material="color: #aaddff; opacity: 0.2; transparent: true; roughness: 0; metalness: 0.5"></a-box>
+                <a-box id="glassWallLeft" position="-4.2 2 0" width="0.1" height="4" depth="8.4"
+                    material="color: #aaddff; opacity: 0.2; transparent: true; roughness: 0; metalness: 0.5"></a-box>
+                <a-box id="glassWallRight" position="4.2 2 0" width="0.1" height="4" depth="8.4"
+                    material="color: #aaddff; opacity: 0.2; transparent: true; roughness: 0; metalness: 0.5"></a-box>
+
+                <!-- Fairy Lights Perimeter -->
+                <a-entity id="fairyLights">
+                    <!-- Front Line -->
+                    <a-sphere class="wall-light-sphere" radius="0.05" position="-4 3.9 4.1"
+                        material="color: #fff; emissive: #fff; emissiveIntensity: 0"></a-sphere>
+                    <a-entity class="wall-light" light="type: point; intensity: 0; distance: 2; color: #ffcc00"
+                        position="-4 3.9 4.1"></a-entity>
+                    <a-sphere class="wall-light-sphere" radius="0.05" position="-2 3.9 4.1"
+                        material="color: #fff; emissive: #fff; emissiveIntensity: 0"></a-sphere>
+                    <a-entity class="wall-light" light="type: point; intensity: 0; distance: 2; color: #ffcc00"
+                        position="-2 3.9 4.1"></a-entity>
+                    <a-sphere class="wall-light-sphere" radius="0.05" position="0 3.9 4.1"
+                        material="color: #fff; emissive: #fff; emissiveIntensity: 0"></a-sphere>
+                    <a-entity class="wall-light" light="type: point; intensity: 0; distance: 2; color: #ffcc00"
+                        position="0 3.9 4.1"></a-entity>
+                    <a-sphere class="wall-light-sphere" radius="0.05" position="2 3.9 4.1"
+                        material="color: #fff; emissive: #fff; emissiveIntensity: 0"></a-sphere>
+                    <a-entity class="wall-light" light="type: point; intensity: 0; distance: 2; color: #ffcc00"
+                        position="2 3.9 4.1"></a-entity>
+                    <a-sphere class="wall-light-sphere" radius="0.05" position="4 3.9 4.1"
+                        material="color: #fff; emissive: #fff; emissiveIntensity: 0"></a-sphere>
+                    <a-entity class="wall-light" light="type: point; intensity: 0; distance: 2; color: #ffcc00"
+                        position="4 3.9 4.1"></a-entity>
+                </a-entity>
+
+                <!-- Luxury Rug -->
+                <a-plane position="0 0.06 0" rotation="-90 0 0" width="8" height="8"
+                    material="color: #2c3e50; roughness: 1; metalness: 0"></a-plane>
+
+                <!-- Potted Plants -->
+                <a-entity id="decorPlants">
+                    <a-entity position="-3.5 0 -3.5">
+                        <a-cylinder radius="0.3" height="0.6" material="color: #444"></a-cylinder>
+                        <a-sphere radius="0.5" position="0 0.8 0" material="color: #2D5A27"></a-sphere>
+                        <a-sphere radius="0.4" position="0.2 1.2 0" material="color: #2D5A27"></a-sphere>
+                    </a-entity>
+                    <a-entity position="3.5 0 -3.5">
+                        <a-cylinder radius="0.3" height="0.6" material="color: #444"></a-cylinder>
+                        <a-sphere radius="0.5" position="0 0.8 0" material="color: #2D5A27"></a-sphere>
+                        <a-sphere radius="0.4" position="-0.2 1.2 0" material="color: #2D5A27"></a-sphere>
+                    </a-entity>
+                </a-entity>
+
+                <!-- Furniture: Sofas -->
+                <a-entity id="canopySofas" position="0 0.5 0">
+                    <a-box position="0 0 -2.5" width="5" height="0.6" depth="1.2" material="color: #555"></a-box>
+                    <a-box position="-3 0 1" width="1.2" height="0.6" depth="3" material="color: #555"></a-box>
+                    <a-box position="3 0 1" width="1.2" height="0.6" depth="3" material="color: #555"></a-box>
+                    <!-- Backrests -->
+                    <a-box position="0 0.5 -3" width="5" height="1" depth="0.2" material="color: #444"></a-box>
+                    <a-box position="-3.5 0.5 1" width="0.2" height="1" depth="3" material="color: #444"></a-box>
+                    <a-box position="3.5 0.5 1" width="0.2" height="1" depth="3" material="color: #444"></a-box>
+                </a-entity>
+
+                <!-- Coffee Table -->
+                <a-box id="canopyTable" position="0 0.4 1" width="2" height="0.1" depth="1.5"
+                    material="color: #8B4513"></a-box>
+                <a-cylinder radius="0.05" height="0.4" position="-0.8 0.2 0.4" material="color: #333"></a-cylinder>
+                <a-cylinder radius="0.05" height="0.4" position="0.8 0.2 0.4" material="color: #333"></a-cylinder>
+                <a-cylinder radius="0.05" height="0.4" position="-0.8 0.2 1.6" material="color: #333"></a-cylinder>
+                <a-cylinder radius="0.05" height="0.4" position="0.8 0.2 1.6" material="color: #333"></a-cylinder>
+
+                <!-- Movie Screen -->
+                <a-entity id="movieScreenGroup" position="0 2.2 10">
+                    <a-box id="screenFrame" width="6.2" height="3.7" depth="0.1" material="color: #111"></a-box>
+                    <a-plane id="screenSurface" width="6" height="3.5" position="0 0 0.06"
+                        material="color: #fff; emissive: #fff; emissiveIntensity: 0.1"></a-plane>
+
+                    <!-- Screen Stands -->
+                    <a-cylinder radius="0.05" height="4" position="-2.5 -2.2 0" material="color: #333"></a-cylinder>
+                    <a-cylinder radius="0.05" height="4" position="2.5 -2.2 0" material="color: #333"></a-cylinder>
+                </a-entity>
+            </a-entity>
 
             <a-entity id="gateArea">
                 <a-box id="pillarLeft" position="-10 2 45" width="0.8" height="4" depth="0.8" material="color: #2c3e50"
-                    cast-shadow="true"></a-box>
+                    cast-shadow="true">
+                    <!-- Day/Night Toggle Button -->
+                    <a-box id="dayNightButton" position="0 0 -10" width="0.2" height="0.2" depth="0.2"
+                        material="color: #f1c40f" day-night-toggle class="raycastable"></a-box>
+                    <a-text value="Day/Night" position="0 0.3 -10" scale="0.5 0.5 0.5" color="#000"
+                        align="center"></a-text>
+
+                    <!-- Wall Lights Physical Switch -->
+                    <a-box id="wallLightSwitch" position="0 -0.5 -10" width="0.2" height="0.2" depth="0.2"
+                        material="color: #2c3e50" wall-light-toggle class="raycastable"></a-box>
+                    <a-text value="Wall Lights" position="0 -0.2 -10" scale="0.5 0.5 0.5" color="#000"
+                        align="center"></a-text>
+                </a-box>
                 <a-box id="pillarRight" position="0 2 45" width="0.8" height="4" depth="0.8" material="color: #2c3e50"
                     cast-shadow="true"></a-box>
                 <a-box id="gateTopFrame" position="-5 4 45" width="10.8" height="0.2" depth="0.8"
@@ -133,31 +391,6 @@
             <a-entity id="basketball" gltf-model="#basketballModel" position="-19 0.3 20" scale="0.6 0.6 0.6"
                 cast-shadow="true"></a-entity>
 
-            <a-entity id="neighborLeft" position="-55 0 25">
-                <a-entity geometry="primitive: plane; width: 40; height: 40" rotation="-90 0 0"
-                    material="src: #floorTex; repeat: 10 10; roughness: 0.8" receive-shadow="true"></a-entity>
-                <a-box position="0 1.5 -20" width="40" height="3" depth="0.5" material="src: #wallTex; repeat: 10 1"
-                    cast-shadow="true"></a-box>
-                <a-box position="-20 1.5 0" width="0.5" height="3" depth="40" material="src: #wallTex; repeat: 10 1"
-                    cast-shadow="true"></a-box>
-                <a-box position="20 1.5 0" width="0.5" height="3" depth="40" material="src: #wallTex; repeat: 10 1"
-                    cast-shadow="true"></a-box>
-                <a-box position="0 1.5 20" width="40" height="3" depth="0.5" material="src: #wallTex; repeat: 10 1"
-                    cast-shadow="true"></a-box>
-            </a-entity>
-
-            <a-entity id="neighborRight" position="45 0 25">
-                <a-entity geometry="primitive: plane; width: 40; height: 40" rotation="-90 0 0"
-                    material="src: #floorTex; repeat: 10 10; roughness: 0.8" receive-shadow="true"></a-entity>
-                <a-box position="0 1.5 -20" width="40" height="3" depth="0.5" material="src: #wallTex; repeat: 10 1"
-                    cast-shadow="true"></a-box>
-                <a-box position="-20 1.5 0" width="0.5" height="3" depth="40" material="src: #wallTex; repeat: 10 1"
-                    cast-shadow="true"></a-box>
-                <a-box position="20 1.5 0" width="0.5" height="3" depth="40" material="src: #wallTex; repeat: 10 1"
-                    cast-shadow="true"></a-box>
-                <a-box position="0 1.5 20" width="40" height="3" depth="0.5" material="src: #wallTex; repeat: 10 1"
-                    cast-shadow="true"></a-box>
-            </a-entity>
     </a-scene>
 </body>
 
