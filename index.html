@@ -145,6 +145,7 @@
             <a-box id="wallFrontRight" position="17.5 1.5 45" width="35" height="3" depth="0.5"
                 material="src: #wallTex; repeat: 8 1; roughness: 0.8" cast-shadow="true"></a-box>
 
+            <!-- Corner Pillars with Lights -->
             <a-entity id="cornerPillars">
                 <!-- Back Left -->
                 <a-box position="-25 1.5 5" width="1" height="4" depth="1"
@@ -180,6 +181,7 @@
                 </a-box>
             </a-entity>
 
+            <!-- Decorative Wall Lights -->
             <a-entity id="wallLights">
                 <!-- Left Wall -->
                 <a-entity position="-25 3 25">
@@ -244,16 +246,13 @@
                 </a-entity>
             </a-entity>
 
+            <!-- Canopy Hangout Area -->
             <a-entity id="canopyArea" position="23 0 18" rotation="0 180 0">
-                <a-cylinder id="canopyPillarFL" radius="0.1" height="4" position="-4 2 4" material="color: #2c3e50">
-                    <a-box id="canopyLightSwitch" position="0 0.1 0.12" width="0.15" height="0.15" depth="0.1"
-                        material="color: #2c3e50" wall-light-toggle class="raycastable"></a-box>
-                    <a-text value="Lights" position="0 0.25 0.12" scale="0.4 0.4 0.4" color="#000"
-                        align="center"></a-text>
-                </a-cylinder>
-                <a-cylinder radius="0.1" height="4" position="4 2 4" material="color: #2c3e50"></a-cylinder>
+                <!-- Pillars -->
                 <a-cylinder radius="0.1" height="4" position="-4 2 -4" material="color: #2c3e50"></a-cylinder>
                 <a-cylinder radius="0.1" height="4" position="4 2 -4" material="color: #2c3e50"></a-cylinder>
+                <a-cylinder radius="0.1" height="4" position="-4 2 4" material="color: #2c3e50"></a-cylinder>
+                <a-cylinder radius="0.1" height="4" position="4 2 4" material="color: #2c3e50"></a-cylinder>
 
                 <!-- Canopy Roof -->
                 <a-box width="8.5" height="0.2" depth="8.5" position="0 4 0"
